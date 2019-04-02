@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../otus-qa/.idea/otus-qa.iml" filepath="$PROJECT_DIR$/../otus-qa/.idea/otus-qa.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/otusQa.iml" filepath="$PROJECT_DIR$/.idea/otusQa.iml" />
     </modules>
   </component>
