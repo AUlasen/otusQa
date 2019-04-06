@@ -1,0 +1,2 @@
+Clone this project and run test_set.py using pytest like this:
+    python -m pytest -s -v <Project Path>\Lesson1\HomeWork3\test_set.py
