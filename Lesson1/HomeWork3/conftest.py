@@ -10,6 +10,7 @@ def session_fixture(request):
 
     request.addfinalizer(session_fin)
 
+
 @pytest.fixture(scope="module", autouse=True)
 def module_fixture(request):
     print('\nModule was started')
@@ -19,6 +20,12 @@ def module_fixture(request):
 
     request.addfinalizer(module_fin)
 
+
 @pytest.fixture(scope="function", autouse=False)
-def test_fixture():
+def test_fixture(request):
     print('\nTest was started')
+
+    def test_fin():
+        print('\nTest was finished')
+
+    request.addfinalizer(test_fin)
