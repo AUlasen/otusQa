@@ -1,0 +1,6 @@
+Clone this project and run test_set.py using pytest.
+Use --useurls parameter to specify one or more Urlss. Separate URLs by commas.
+Suported URLs: "https://api.cdnjs.com", "https://api.openbrewerydb.org", "https://dog.ceo/api"
+
+Example:
+    python -m pytest -s -v <Project Path>\Lesson3\test_api.py --useurls https://api.cdnjs.com,https://dog.ceo/api
