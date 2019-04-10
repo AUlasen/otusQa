@@ -17,11 +17,14 @@ def pytest_collection_modifyitems(items, config):
         config.hook.pytest_deselected(items=deselected_items)
         items[:] = selected_items
 
+
 def pytest_addoption(parser):
-    parser.addoption("--useurls", action="store", default=None, help="Enter tested urls, separate them by comma")
+    parser.addoption("--useurls", action="store", default=None,
+                     help="Enter tested urls, separate them by comma")
+
 
 def check_urls(use_url):
-    good_urls = ("https://api.cdnjs.com","https://api.openbrewerydb.org","https://dog.ceo/api")
+    good_urls = ("https://api.cdnjs.com", "https://api.openbrewerydb.org", "https://dog.ceo/api")
 
     if use_url is None:
         raise ValueError('You must specify --useurls parameter.')

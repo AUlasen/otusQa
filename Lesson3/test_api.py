@@ -1,5 +1,3 @@
-import random
-
 import pytest
 import requests
 
@@ -9,6 +7,7 @@ dog_api_endpoints = ["breeds/list/all", "breeds/image/random",
                      "breeds/image/random/3", "breed/hound/images",
                      "breed/hound/images/random", "breed/hound/images/random/3",
                      "breed/hound/list", "breed/hound/afghan/images"]
+
 
 @pytest.fixture(scope="session", autouse=True)
 def session_fixture(request):
@@ -29,8 +28,10 @@ def test_dog_api(endpoint):
     assert response.status_code == 200
     assert response.headers['Content-type'] == "application/json"
 
+
 breweries_url = "https://api.openbrewerydb.org/breweries"
-breweries_endpoints = ["","?by_state=new_york", "?by_name=cooper", "/5494"]
+breweries_endpoints = ["", "?by_state=new_york", "?by_name=cooper", "/5494"]
+
 
 @pytest.mark.site_type('https://api.openbrewerydb.org')
 @pytest.mark.parametrize("endpoint", breweries_endpoints)
@@ -41,9 +42,12 @@ def test_breweries_api(endpoint):
     assert response.status_code == 200
     assert response.headers['Content-type'].__contains__("application/json")
 
+
 cdnjs_url = "https://api.cdnjs.com"
-cdnjs_endpoints = [("libraries","application/json"), ("libraries?output=human","text/html"),
-                   ("libraries?search=jquery&output=human","text/html")]
+cdnjs_endpoints = [("libraries", "application/json"), ("libraries?output=human", "text/html"),
+                   ("libraries?search=jquery&output=human", "text/html")]
+
+
 @pytest.mark.site_type('https://api.cdnjs.com')
 @pytest.mark.parametrize("endpoint, content_type", cdnjs_endpoints)
 def test_cdnjs_api(endpoint, content_type):
