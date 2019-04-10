@@ -20,7 +20,7 @@ def session_fixture(request):
     request.addfinalizer(session_fin)
 
 
-
+@pytest.mark.site_type('https://dog.ceo/api')
 @pytest.mark.parametrize("endpoint", dog_api_endpoints)
 def test_dog_api(endpoint):
     url = "/".join([dog_api_url, endpoint])
@@ -32,6 +32,7 @@ def test_dog_api(endpoint):
 breweries_url = "https://api.openbrewerydb.org/breweries"
 breweries_endpoints = ["","?by_state=new_york", "?by_name=cooper", "/5494"]
 
+@pytest.mark.site_type('https://api.openbrewerydb.org')
 @pytest.mark.parametrize("endpoint", breweries_endpoints)
 def test_breweries_api(endpoint):
     url = "".join([breweries_url, endpoint])
@@ -41,8 +42,9 @@ def test_breweries_api(endpoint):
     assert response.headers['Content-type'].__contains__("application/json")
 
 cdnjs_url = "https://api.cdnjs.com"
-cdnjs_endpoints = [("libraries","application/json"), ("libraries?output=human","text/html"), ("libraries?search=jquery&output=human","text/html")]
-
+cdnjs_endpoints = [("libraries","application/json"), ("libraries?output=human","text/html"),
+                   ("libraries?search=jquery&output=human","text/html")]
+@pytest.mark.site_type('https://api.cdnjs.com')
 @pytest.mark.parametrize("endpoint, content_type", cdnjs_endpoints)
 def test_cdnjs_api(endpoint, content_type):
     url = "/".join([cdnjs_url, endpoint])
