@@ -4,7 +4,6 @@ import selenium
 from selenium.webdriver import ChromeOptions, FirefoxOptions, IeOptions
 
 
-
 class App:
     wd = None
 
@@ -16,23 +15,24 @@ def session_fixture(request):
     browser = request.config.getoption("--browser")
     #
     if browser == 'chrome':
-        print("chrome")
+        print("chrome will be started")
         options = ChromeOptions()
         options.add_argument("--start-fullscreen")
         options.add_argument('--headless')
         App.wd = webdriver.Chrome(options=options)
+
     elif browser == 'firefox':
-        print("firefox")
+        print("firefox will be started")
         options = FirefoxOptions()
         options.add_argument("--start-fullscreen")
         options.add_argument('--headless')
-        App.wd = webdriver.Firefox()
+        App.wd = webdriver.Firefox(options=options)
     else:
-        print("ie")
+        print("ie will be started")
         options = IeOptions()
         options.add_argument("--start-fullscreen")
         options.add_argument('--headless')
-        App.wd = webdriver.Ie()
+        App.wd = webdriver.Ie(options=options)
     #
     # #return wd
 
@@ -41,6 +41,11 @@ def session_fixture(request):
         print('\nSesion was finished')
     #
     request.addfinalizer(session_fin)
+
+
+@pytest.fixture(scope="function", autouse=False)
+def test_fixture():
+    return App.wd
 
 
 def pytest_addoption(parser):
