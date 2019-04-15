@@ -1,9 +1,9 @@
 from selenium.webdriver.common.by import By
 
-class BaseLocators(object):
+class BaseLocators():
     PRIMARY_BUTTON = (By.CLASS_NAME, "btn.btn-primary")
 
-class LoginPageLocators(object):
+class LoginPageLocators():
 
     USERNAME = (By.ID, "input-username")
     PASSWORD = (By.ID, "input-password")
