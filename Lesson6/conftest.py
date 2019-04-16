@@ -4,6 +4,7 @@ import sys
 from selenium import webdriver
 from selenium.webdriver import IeOptions
 
+
 def pytest_addoption(parser):
     parser.addoption("--address", action="store", default="http://192.168.56.103/", help="Opencart web address")
     parser.addoption("--browser", action="store", default="firefox", help="Browser name")
