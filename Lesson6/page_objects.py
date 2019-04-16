@@ -12,3 +12,7 @@ class LoginPage(BasePage):
 
     def login(self):
         self.driver.find_element(*BaseLocators.PRIMARY_BUTTON).click()
+
+    def get_alert_text(self):
+        return self.driver.find_element(*LoginPageLocators.ERROR).get_attribute('innerHTML')
+

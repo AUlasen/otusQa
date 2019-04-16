@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver import IeOptions
 
 def pytest_addoption(parser):
-    parser.addoption("--address", action="store", default="http://192.168.56.3/", help="Opencart web address")
+    parser.addoption("--address", action="store", default="http://192.168.56.103/", help="Opencart web address")
     parser.addoption("--browser", action="store", default="firefox", help="Browser name")
 
 
@@ -14,7 +14,7 @@ def driver(request):
     browser = request.config.getoption("--browser")
     if browser == 'firefox':
         capabilities = webdriver.DesiredCapabilities.FIREFOX.copy()
-        capabilities['timeouts'] = {'implicit': 300000, 'pageLoad': 300000, 'script': 30000}
+        capabilities['timeouts'] = {'implicit': 3000, 'pageLoad': 3000, 'script': 3000}
         capabilities['loggingPrefs'] = {'browser': 'ALL', 'client': 'ALL', 'driver': 'ALL',
                                         'performance': 'ALL', 'server': 'ALL'}
         profile = webdriver.FirefoxProfile()
