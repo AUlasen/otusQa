@@ -1,5 +1,5 @@
 from selenium.webdriver.remote.webelement import WebElement
-
+import time
 from Lesson7.locator import *
 from Lesson7.page import BasePage
 from selenium.webdriver.common.by import By
@@ -29,34 +29,64 @@ class CatalogProductPage(BasePage):
         self.driver.find_element(*CatalogProductPageLocators.DELETE).click()
 
     def select_product_by_name(self, prod_name):
-        table: WebElement = self.driver.find_element(*CatalogProductPageLocators.PRODUCT_TABLE)
-        tr_list = table.find_elements(By.TAG_NAME, "tr")
-        for tr_el in tr_list:
-            td_list = tr_el.find_elements(By.TAG_NAME, "td")
-            cur_prod_name: str = td_list[2].get_attribute('innerText')
-            if cur_prod_name == prod_name:
-                td_list[0].find_element(By.TAG_NAME, "input").click()
-                break
+        tr_el = self._locate_product_tr_element(prod_name)
+        td_list = tr_el.find_elements(By.TAG_NAME, "td")
+        td_list[0].find_element(By.TAG_NAME, "input").click()
+
+    # def has_product_name(self, prod_name):
+    #     table: WebElement = self.driver.find_element(*CatalogProductPageLocators.PRODUCT_TABLE)
+    #     tr_list = table.find_elements(By.TAG_NAME, "tr")
+    #     for tr_el in tr_list:
+    #         td_list = tr_el.find_elements(By.TAG_NAME, "td")
+    #         cur_prod_name: str = td_list[2].get_attribute('innerText')
+    #         if cur_prod_name == prod_name:
+    #             return True
+    #     return False
 
     def has_product_name(self, prod_name):
+        tr = self._locate_product_tr_element(prod_name)
+        if tr is not None:
+            return True
+        return False
+
+    def click_edit_product_by_name(self, prod_name):
+        tr_el = self._locate_product_tr_element(prod_name)
+        td_list = tr_el.find_elements(By.TAG_NAME, "td")
+        td_list[7].find_element(By.TAG_NAME, "a").click()
+
+    def _locate_product_tr_element(self, prod_name) -> WebElement:
         table: WebElement = self.driver.find_element(*CatalogProductPageLocators.PRODUCT_TABLE)
         tr_list = table.find_elements(By.TAG_NAME, "tr")
         for tr_el in tr_list:
             td_list = tr_el.find_elements(By.TAG_NAME, "td")
             cur_prod_name: str = td_list[2].get_attribute('innerText')
             if cur_prod_name == prod_name:
-                return True
-        return False
+                return tr_el
+
+        pagination_lst: list = self.driver.find_elements(*CatalogProductPageLocators.PAGINATION)
+        if pagination_lst.__len__() != 0:
+            pagination: WebElement = pagination_lst[0]
+            pagination_btn_list = pagination.find_elements(By.TAG_NAME, "a")
+            for pag_btn in pagination_btn_list:
+                if pag_btn.get_attribute('innerText') == ">":
+                    pag_btn.click()
+                    time.sleep(5)
+                    return self._locate_product_tr_element(prod_name)
+
+        return None
 
 
 class CatalogProductAddPage(BasePage):
     def set_product_name(self, prod_name):
+        self.driver.find_element(*CatalogProductAddPageLocators.PRODUCT_NAME).clear()
         self.driver.find_element(*CatalogProductAddPageLocators.PRODUCT_NAME).send_keys(prod_name)
 
     def set_meta_tag(self, meta_tag):
+        self.driver.find_element(*CatalogProductAddPageLocators.META_TAG_TITLE).clear()
         self.driver.find_element(*CatalogProductAddPageLocators.META_TAG_TITLE).send_keys(meta_tag)
 
     def set_model(self, model):
+        self.driver.find_element(*CatalogProductAddPageLocators.MODEL).clear()
         self.driver.find_element(*CatalogProductAddPageLocators.MODEL).send_keys(model)
 
     def click_data_tab(self):

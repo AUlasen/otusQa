@@ -17,6 +17,7 @@ class CatalogProductPageLocators:
     COPY = (By.CSS_SELECTOR, "button.btn.btn-default")
     DELETE = (By.CSS_SELECTOR, "button.btn.btn-danger")
     PRODUCT_TABLE = (By.CSS_SELECTOR, "#form-product table")
+    PAGINATION = (By.CSS_SELECTOR, "ul.pagination")
 
 
 class CatalogProductAddPageLocators:

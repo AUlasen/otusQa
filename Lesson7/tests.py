@@ -20,7 +20,7 @@ def user_token(driver, request):
     login_page.set_username("admin")
     login_page.set_password("admin")
     login_page.login()
-    time.sleep(10)
+    time.sleep(5)
     print(driver.current_url)
     parsed = urlparse.urlparse(driver.current_url)
     print(parsed)
@@ -29,21 +29,24 @@ def user_token(driver, request):
     return user_token
 
 
-@pytest.mark.skip
-@pytest.mark.parametrize("prod_name", ["del_test"])
-def test_delete_product(driver: webdriver, request, user_token, prod_name):
+@pytest.mark.parametrize("prod_name", ["delete_test"])
+def test_delete_product(driver, request, user_token, prod_name):
+
     url = "".join([request.config.getoption("--address"), product_url, "&user_token=", user_token])
     driver.get(url)
+
     product_page = CatalogProductPage(driver)
     product_page.select_product_by_name(prod_name)
     product_page.click_del()
+
     driver.switch_to.alert.accept()
     time.sleep(10)
+
     assert product_page.has_product_name(prod_name) is False
 
 
 @pytest.mark.parametrize("prod_name,meta_tag_title,model", [("create_test", "create_test", "create_test")])
-def test_create_product(driver: webdriver, request, user_token, prod_name, meta_tag_title, model):
+def test_create_product(driver, request, user_token, prod_name, meta_tag_title, model):
 
     url = "".join([request.config.getoption("--address"), product_url, "&user_token=", user_token])
     driver.get(url)
@@ -60,4 +63,38 @@ def test_create_product(driver: webdriver, request, user_token, prod_name, meta_
     add_page.click_save()
     time.sleep(5)
 
+    driver.get(url)
+    time.sleep(5)
+
     assert product_page.has_product_name(prod_name) is True
+
+
+@pytest.mark.parametrize("prod_name,new_prod_name", [("edit_test_before", "edit_test_after")])
+def test_edit_product(driver, request, user_token, prod_name, new_prod_name):
+
+    url = "".join([request.config.getoption("--address"), product_url, "&user_token=", user_token])
+    driver.get(url)
+
+    product_page = CatalogProductPage(driver)
+    product_page.select_product_by_name(prod_name)
+    product_page.click_edit_product_by_name(prod_name)
+    time.sleep(10)
+
+    add_page = CatalogProductAddPage(driver)
+    add_page.set_product_name(new_prod_name)
+    add_page.click_save()
+    time.sleep(10)
+
+    assert product_page.has_product_name(new_prod_name) is True
+
+
+@pytest.mark.skip
+@pytest.mark.parametrize("prod_name,", ["zzz", "rrrr", "llllllllllllll"])
+def test_test(driver, request, user_token, prod_name):
+
+    url = "".join([request.config.getoption("--address"), product_url, "&user_token=", user_token])
+    driver.get(url)
+
+    product_page = CatalogProductPage(driver)
+    assert product_page.has_product_name(prod_name) is True
+

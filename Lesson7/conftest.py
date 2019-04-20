@@ -15,7 +15,7 @@ def driver(request):
     browser = request.config.getoption("--browser")
     if browser == 'firefox':
         capabilities = webdriver.DesiredCapabilities.FIREFOX.copy()
-        capabilities['timeouts'] = {'implicit': 3000, 'pageLoad': 3000, 'script': 3000}
+        capabilities['timeouts'] = {'implicit': 10000, 'pageLoad': 10000, 'script': 3000}
         capabilities['loggingPrefs'] = {'browser': 'ALL', 'client': 'ALL', 'driver': 'ALL',
                                         'performance': 'ALL', 'server': 'ALL'}
         profile = webdriver.FirefoxProfile()
