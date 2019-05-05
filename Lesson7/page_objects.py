@@ -1,9 +1,13 @@
 from selenium.webdriver.remote.webelement import WebElement
 import time
+
+from selenium.webdriver.support.wait import WebDriverWait
+
+from Lesson7.exceptions import TestErrorException
 from Lesson7.locator import *
 from Lesson7.page import BasePage
 from selenium.webdriver.common.by import By
-
+from selenium.webdriver.support import expected_conditions as EC
 
 class LoginPage(BasePage):
 
@@ -30,6 +34,8 @@ class CatalogProductPage(BasePage):
 
     def select_product_by_name(self, prod_name):
         tr_el = self._locate_product_tr_element(prod_name)
+        if tr_el is None:
+            raise TestErrorException("Element with name ".join("prod_name").join(" doesnt exists"))
         td_list = tr_el.find_elements(By.TAG_NAME, "td")
         td_list[0].find_element(By.TAG_NAME, "input").click()
 
@@ -74,6 +80,10 @@ class CatalogProductPage(BasePage):
                     return self._locate_product_tr_element(prod_name)
 
         return None
+
+    def wait_success(self, time_to_wait):
+        wait = WebDriverWait(self.driver, time_to_wait)
+        wait.until(EC.element_to_be_clickable(CatalogProductPageLocators.SUCCESS_ALERT))
 
 
 class CatalogProductAddPage(BasePage):

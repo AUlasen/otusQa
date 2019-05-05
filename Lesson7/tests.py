@@ -2,7 +2,8 @@ import pytest
 import time
 import urllib.parse as urlparse
 
-from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from Lesson7.page_objects import LoginPage, CatalogProductPage, CatalogProductAddPage
 
@@ -39,8 +40,10 @@ def test_delete_product(driver, request, user_token, prod_name):
     product_page.select_product_by_name(prod_name)
     product_page.click_del()
 
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.alert_is_present())
     driver.switch_to.alert.accept()
-    time.sleep(10)
+    product_page.wait_success(10)
 
     assert product_page.has_product_name(prod_name) is False
 
@@ -61,10 +64,8 @@ def test_create_product(driver, request, user_token, prod_name, meta_tag_title, 
     add_page.click_data_tab()
     add_page.set_model(model)
     add_page.click_save()
-    time.sleep(5)
 
     driver.get(url)
-    time.sleep(5)
 
     assert product_page.has_product_name(prod_name) is True
 
@@ -78,23 +79,13 @@ def test_edit_product(driver, request, user_token, prod_name, new_prod_name):
     product_page = CatalogProductPage(driver)
     product_page.select_product_by_name(prod_name)
     product_page.click_edit_product_by_name(prod_name)
-    time.sleep(10)
 
     add_page = CatalogProductAddPage(driver)
     add_page.set_product_name(new_prod_name)
     add_page.click_save()
-    time.sleep(10)
+
+    product_page.wait_success(10)
 
     assert product_page.has_product_name(new_prod_name) is True
 
-
-@pytest.mark.skip
-@pytest.mark.parametrize("prod_name,", ["zzz", "rrrr", "llllllllllllll"])
-def test_test(driver, request, user_token, prod_name):
-
-    url = "".join([request.config.getoption("--address"), product_url, "&user_token=", user_token])
-    driver.get(url)
-
-    product_page = CatalogProductPage(driver)
-    assert product_page.has_product_name(prod_name) is True
 

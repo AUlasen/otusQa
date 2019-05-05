@@ -18,6 +18,7 @@ class CatalogProductPageLocators:
     DELETE = (By.CSS_SELECTOR, "button.btn.btn-danger")
     PRODUCT_TABLE = (By.CSS_SELECTOR, "#form-product table")
     PAGINATION = (By.CSS_SELECTOR, "ul.pagination")
+    SUCCESS_ALERT = (By.CSS_SELECTOR, "div.alert.alert-success.alert-dismissible")
 
 
 class CatalogProductAddPageLocators:
