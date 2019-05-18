@@ -22,7 +22,7 @@ def user_token(driver, request):
     login_page.set_username("admin")
     login_page.set_password("admin")
     login_page.login()
-    time.sleep(5)
+    time.sleep(10)
     print(driver.current_url)
     parsed = urlparse.urlparse(driver.current_url)
     print(parsed)
@@ -31,8 +31,8 @@ def user_token(driver, request):
     return user_token
 
 
-@pytest.mark.parametrize("prod_name,meta_tag_title,model,img_name", [("create_test", "create_test", "create_test", "otus.jpg")])
-def test_create_product(driver, request, user_token, prod_name, meta_tag_title, model, img_name):
+@pytest.mark.parametrize("prod_name,meta_tag_title,model,img_name,add_img_list", [("create_test", "create_test", "create_test", "otus.jpg", ["add_img_2.jpg", "add_img_3.jpg"])])
+def test_create_product(driver, request, user_token, prod_name, meta_tag_title, model, img_name, add_img_list):
 
     url = "".join([request.config.getoption("--address"), product_url, "&user_token=", user_token])
     driver.get(url)
@@ -56,8 +56,15 @@ def test_create_product(driver, request, user_token, prod_name, meta_tag_title, 
     image_manager = ImageManager(driver)
     image_manager.wait_existence(10)
     image_manager.upload_img(img_path, user_token)
-
     image_manager.select_img(img_name)
+
+    for add_img_name in add_img_list:
+        img_path = os.path.join(dir_path, add_img_name)
+        add_page.upload_additional_img()
+        image_manager = ImageManager(driver)
+        image_manager.wait_existence(10)
+        image_manager.upload_img(img_path, user_token)
+        image_manager.select_img(add_img_name)
 
     add_page.click_save()
 

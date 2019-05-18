@@ -1,6 +1,6 @@
 from selenium.webdriver.remote.webelement import WebElement
 import time
-
+from pynput.keyboard import Key, Controller
 from selenium.webdriver.support.wait import WebDriverWait
 
 from Lesson11.exceptions import TestErrorException
@@ -111,6 +111,17 @@ class CatalogProductAddPage(BasePage):
         wait.until(EC.element_to_be_clickable(CatalogProductAddPageLocators.ADD_IMG_BTN))
         self.driver.find_element(*CatalogProductAddPageLocators.ADD_IMG_BTN).click()
 
+    def upload_additional_img(self):
+        rows: list = self.driver.find_elements(*CatalogProductAddPageLocators.ADDITIONAL_IMG_ROWS)
+        row_num = rows.__len__()
+        self.driver.find_element(*CatalogProductAddPageLocators.ADDITIONAL_IMG_ADD_BTN).click()
+
+        self.driver.find_element(By.ID, "thumb-image" + str(row_num)).click()
+        wait = WebDriverWait(self.driver, 10)
+        wait.until(EC.element_to_be_clickable(CatalogProductAddPageLocators.ADD_IMG_BTN))
+        self.driver.find_element(*CatalogProductAddPageLocators.ADD_IMG_BTN).click()
+
+
     def click_save(self):
         self.driver.find_element(*CatalogProductAddPageLocators.SAVE).click()
 
@@ -168,6 +179,7 @@ class ImageManager(BasePage):
         wait.until(EC.alert_is_present())
         self.driver.switch_to.alert.accept()
         #self.driver.execute_script("$('#form-upload').remove();")
+
 
 
     def select_img(self, img_name):

@@ -32,7 +32,8 @@ class CatalogProductAddPageLocators:
     IMG_TAB = (By.CSS_SELECTOR, "form#form-product ul a[href = '#tab-image']")
     IMG = (By.ID, "thumb-image")
     ADD_IMG_BTN = (By.ID, "button-image")
-
+    ADDITIONAL_IMG_ADD_BTN = (By.CSS_SELECTOR, "#images tfoot button.btn.btn-primary")
+    ADDITIONAL_IMG_ROWS = (By.CSS_SELECTOR, "#images tbody tr")
 
 class ImageManagerLocators:
     FILE_MANAGER = (By.ID, "filemanager")
