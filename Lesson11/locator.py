@@ -35,6 +35,7 @@ class CatalogProductAddPageLocators:
     ADDITIONAL_IMG_ADD_BTN = (By.CSS_SELECTOR, "#images tfoot button.btn.btn-primary")
     ADDITIONAL_IMG_ROWS = (By.CSS_SELECTOR, "#images tbody tr")
 
+
 class ImageManagerLocators:
     FILE_MANAGER = (By.ID, "filemanager")
     UPLOAD_BTN = (By.ID, "button-upload")
@@ -42,3 +43,15 @@ class ImageManagerLocators:
     IMGS = (By.CSS_SELECTOR, "#filemanager a.thumbnail")
 
 
+class CatalogDownloadsLocators:
+    ADD_BTN = (By.CSS_SELECTOR, ".page-header a.btn.btn-primary")
+    DOWNLOADS_TABLE = (By.CSS_SELECTOR, "#form-download div.table-responsive table")
+
+
+class CatalogDownloadsAddLocators:
+    DOWNLOAD_NAME = (By.CSS_SELECTOR, "#form-download input[placeholder = 'Download Name']")
+    FILE_NAME = (By.CSS_SELECTOR, "#form-download input[placeholder = 'Filename']")
+    MASK = (By.CSS_SELECTOR, "#form-download input[placeholder = 'Mask']")
+    UPLOAD_BTN = (By.ID, "button-upload")
+    UPLOAD_INPUT = (By.CSS_SELECTOR, "#form-upload input")
+    SAVE = (By.CSS_SELECTOR, "button.btn.btn-primary")

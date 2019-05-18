@@ -181,7 +181,6 @@ class ImageManager(BasePage):
         #self.driver.execute_script("$('#form-upload').remove();")
 
 
-
     def select_img(self, img_name):
         img_lst = self.driver.find_elements(*ImageManagerLocators.IMGS)
         for img in img_lst:
@@ -191,3 +190,70 @@ class ImageManager(BasePage):
                 return
         raise TestErrorException("Cant find img ".join(img_name))
 
+
+class CatalogDownloadsPage(BasePage):
+    def click_add_btn(self):
+        self.driver.find_element(*CatalogDownloadsLocators.ADD_BTN).click()
+
+    def has_download(self, name):
+        table: WebElement = self.driver.find_element(*CatalogDownloadsLocators.DOWNLOADS_TABLE)
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        for row in rows:
+            cells = row.find_elements(By.TAG_NAME, "td")
+            download_name = cells[1].get_attribute("innerText")
+            if download_name == name:
+                return True
+
+
+class CatalogDownloadsAddPage(BasePage):
+
+    def set_download_name(self, name):
+        self.driver.find_element(*CatalogDownloadsAddLocators.DOWNLOAD_NAME).send_keys(name)
+
+    def set_mask(self, mask):
+        self.driver.find_element(*CatalogDownloadsAddLocators.MASK).send_keys(mask)
+
+    def click_save(self):
+        self.driver.find_element(*CatalogDownloadsAddLocators.SAVE).click()
+
+    def upload_file(self, file_path, user_token):
+
+        wait = WebDriverWait(self.driver, 10)
+
+        self.driver.execute_script("$('#form-upload').remove();")
+        self.driver.execute_script("$('body').prepend('<form enctype=\"multipart/form-data\" id=\"form-upload\" style=\"display: none;\"><input type=\"file\" name=\"file\" /></form>');")
+
+        self.driver.find_element(*CatalogDownloadsAddLocators.UPLOAD_INPUT).send_keys(file_path)
+
+        fun = ("$.ajax({"
+        "url: 'index.php?route=catalog/download/upload&user_token=") + user_token + ("',"
+        "type: 'post',"
+        "dataType: 'json',"
+        "data: new FormData($('#form-upload')[0]),"
+        "cache: false,"
+        "contentType: false,"
+        "processData: false,"
+        "beforeSend: function() {"
+        "  $('#button-upload').button('loading');"
+        "},"
+        "complete: function() {"
+        "  $('#button-upload').button('reset');"
+        "},"
+        "success: function(json) {"
+        "  if (json['error']) {"
+        "    alert(json['error']);"
+        "  }"
+        "  if (json['success']) {"
+        "    alert(json['success']);"
+        "    $('input[name=\\'filename\\']').val(json['filename']);"
+        "    $('input[name=\\'mask\\']').val(json['mask']);"
+        "  }"
+        "},"
+        "error: function(xhr, ajaxOptions, thrownError) {"
+        "  alert(thrownError + \"\\r\\n\" + xhr.statusText + \"\\r\\n\" + xhr.responseText);"
+        "}"
+        "});")
+
+        self.driver.execute_script(fun)
+        wait.until(EC.alert_is_present())
+        self.driver.switch_to.alert.accept()
