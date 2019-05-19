@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import sys
 import logging
@@ -11,12 +13,12 @@ from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriv
 def pytest_addoption(parser):
     parser.addoption("--address", action="store", default="http://192.168.56.103/", help="Opencart web address")
     parser.addoption("--browser", action="store", default="firefox", help="Browser name")
-    parser.addoption("--timeouts", action="store", default="10000", help="Timeouts")
-    parser.addoption("--logpath", action="store", default="C:\\temp\\mylog.log", help="Timeouts")
+    parser.addoption("--timeouts", action="store", default="15000", help="Timeouts")
+    parser.addoption("--logfolder", action="store", default="C:\\temp", help="Logs folder")
 
 
 @pytest.fixture(scope="session", autouse=True)
-def driver(logger, request):
+def driver(request):
     browser = request.config.getoption("--browser")
     try:
         timeout_str = request.config.getoption("--timeouts")
@@ -42,7 +44,7 @@ def driver(logger, request):
         capabilities['acceptSslCerts'] = True
         capabilities['acceptInsecureCerts'] = True
         wd = webdriver.Chrome(desired_capabilities=capabilities)
-        wd.fullscreen_window()
+        wd.maximize_window()
     elif browser == 'ie':
         options = IeOptions()
         options.add_argument("--start-fullscreen")
@@ -52,34 +54,44 @@ def driver(logger, request):
         print('Unsupported browser!')
         sys.exit(1)
 
-    logged_driver = EventFiringWebDriver(wd, MyListener(logger, wd))
+    log_folder = request.config.getoption("--logfolder")
+    logger = get_logger(log_folder, "webDriverLog")
+    logged_driver = EventFiringWebDriver(wd, WdEventListener(logger))
 
     yield logged_driver
+
+    if browser == 'chrome':
+        browser_logger = get_logger(log_folder, "chromeLog", "%(message)s")
+        for l in logged_driver.get_log("browser"):
+            browser_logger.info(l)
     logged_driver.quit()
 
 
-@pytest.fixture(scope="session", autouse=True)
-def logger(request):
-    log_path = request.config.getoption("--logpath")
-    logger: Logger = logging.getLogger("webDriverLog")
+def get_logger(log_folder, log_name, log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"):
+    # log_folder = request.config.getoption("--logfolder")
+    # log_name = "webDriverLog"
+    log_file_name = log_name + ".log"
+    log_file_path = os.path.join(log_folder, log_file_name)
+
+    logger: Logger = logging.getLogger(log_name)
     logger.setLevel(logging.INFO)
 
-    fh = logging.FileHandler(log_path, mode='w')
+    fh = logging.FileHandler(log_file_path, mode='w')
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(log_format)
     fh.setFormatter(formatter)
 
     logger.addHandler(fh)
 
-    logger.info("Session logger is started.")
+    logger.info(log_name + " logger is started.")
 
     return logger
 
-class MyListener(AbstractEventListener):
 
-    def __init__(self, logger: Logger, driver: webdriver):
+class WdEventListener(AbstractEventListener):
+
+    def __init__(self, logger: Logger):
         self.logger: Logger = logger
-        self.driver: webdriver = driver
 
     def before_find(self, by, value, driver):
         self.logger.info("Find dy: " + by + "; value: " + value)
@@ -88,7 +100,7 @@ class MyListener(AbstractEventListener):
         self.logger.info("Found by: " + by + "; value: " + value)
 
     def on_exception(self, exception, driver):
-       # driver.save_screenshot('screenshots/exception.png')
+        driver.save_screenshot('screenshots/exception.png')
         self.logger.critical(exception)
 
     def before_navigate_to(self, url, driver):
@@ -96,4 +108,6 @@ class MyListener(AbstractEventListener):
 
     def after_navigate_to(self, url, driver):
         self.logger.info("Current URL: " + driver.current_url)
+
+
 
