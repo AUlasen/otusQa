@@ -20,14 +20,4 @@ def test_2():
 
 
 
-def test_3():
-    assert True
-
-
-def test_4():
-    assert True
-
-
-def test_5():
-    assert True
 
