@@ -7,7 +7,8 @@ from Lesson11.exceptions import TestErrorException
 from Lesson11.locator import *
 from Lesson11.page import BasePage
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as EC, expected_conditions
+
 
 class LoginPage(BasePage):
 
@@ -255,5 +256,5 @@ class CatalogDownloadsAddPage(BasePage):
         "});")
 
         self.driver.execute_script(fun)
-        wait.until(EC.alert_is_present())
+        wait.until(expected_conditions.alert_is_present())
         self.driver.switch_to.alert.accept()
