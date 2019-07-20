@@ -39,7 +39,7 @@ def driver(request):
         options.add_argument('--headless')
         wd = webdriver.Ie(options=options)
     else:
-        print('Unsupported browser!')
+        print('Unsupported browser: '.join(browser))
         sys.exit(1)
     yield wd
     wd.quit()
