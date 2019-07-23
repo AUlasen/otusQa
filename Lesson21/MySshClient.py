@@ -2,11 +2,12 @@ import paramiko
 
 
 class SimpleSshClient:
-    def __init__(self, hostname, username, password, port):
+    def __init__(self, hostname, username, password, port, encoding="utf-8"):
         self.hostname = hostname
         self.username = username
         self.password = password
         self.port = port
+        self.encoding = encoding
 
     def execute(self, command, password=None):
         client = paramiko.SSHClient()
@@ -21,9 +22,9 @@ class SimpleSshClient:
         stdout_cont: str = stdout.read()
         stderr_cont: str = stderr.read()
         if stderr_cont.__len__() != 0:
-            raise MySshClientException(stderr_cont)
+            raise MySshClientException(stderr_cont.decode(self.encoding))
         client.close()
-        return stdout_cont
+        return stdout_cont.decode(self.encoding)
 
 
 class MySshClientException(Exception):
