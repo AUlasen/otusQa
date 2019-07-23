@@ -1,3 +1,5 @@
+import ftplib
+
 from Lesson21.MySshClient import SimpleSshClient, MySshClientException
 
 host = '192.168.56.103'
@@ -6,7 +8,8 @@ secret = 'and'
 port = 22
 
 ftpuser_name = 'testftpuser'
-ftpuser_pass = 'testftpuser'
+ftpuser_pass = '12345678'  # Не более 8 символов
+ftp_port = 21
 
 def install_ftp(client: SimpleSshClient, secret):
     client.execute("sudo apt-get install vsftpd", secret)
@@ -46,4 +49,11 @@ except MySshClientException as e:
 
 
 client.execute("sudo userdel -r " + ftpuser_name, secret)
-client.execute("sudo useradd -m " + ftpuser_name + " -p " + ftpuser_pass, secret)
+ftpuser_pass_encoded = client.execute("openssl passwd -crypt " + ftpuser_pass)
+client.execute("sudo useradd -m " + ftpuser_name + " -p " + ftpuser_pass_encoded, secret)
+
+# Проверка
+session = ftplib.FTP()
+session.connect(host, ftp_port)
+session.login(ftpuser_name,ftpuser_pass)
+session.dir()
