@@ -1,8 +1,10 @@
 import subprocess
 import os
 
+
 class HelperException(BaseException):
     pass
+
 
 def get_cur_dir():
     s = subprocess.check_output(["pwd"])
@@ -17,8 +19,8 @@ def get_package_ver(name):
     return pack_info[2]
 
 
-def get_files(dir):
-    proc1 = subprocess.Popen(['ls', '-p', dir], stdout=subprocess.PIPE)
+def get_files(dirr):
+    proc1 = subprocess.Popen(['ls', '-p', dirr], stdout=subprocess.PIPE)
     proc2 = subprocess.Popen(['grep', '-v', '/'], stdin=proc1.stdout,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc1.stdout.close()
@@ -48,9 +50,7 @@ def is_port_open(host, port, password, transport="TCP"):
         proc1 = subprocess.Popen(nmap_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True)
     except FileNotFoundError as e:
         raise HelperException("nmap should be installed") from e
-    #pass_str = password + '\n'
     p1_out = proc1.communicate('{}\n'.format(password))
-    #print(p1_out)
     proc2 = subprocess.Popen(['grep', '^' + str(port)], stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, err = proc2.communicate(p1_out[0])
@@ -60,5 +60,67 @@ def is_port_open(host, port, password, transport="TCP"):
     return False
 
 
+def is_service_active(name):
+    proc1 = subprocess.Popen(['service', name, 'status'], stdout=subprocess.PIPE)
+    proc2 = subprocess.Popen(['grep', 'Active'], stdin=proc1.stdout,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc1.stdout.close()
+    out, err = proc2.communicate()
+    str_lst = out.decode().split()
+    if str_lst[1] == 'active':
+        return True
+    return False
 
-#print(is_port_open("127.0.0.1", 80, "and", transport="TCP"))
+
+def get_proc_list():
+    s = subprocess.check_output(["ps", "-A", "--no-headers"])
+    lines = s.decode().splitlines()
+    proc = {}
+    for line in lines:
+        proc_info = line.split()
+        pid = proc_info[0]
+        cmd = proc_info[3]
+        proc[pid] = cmd
+
+    return proc
+
+
+def get_proc_stat(pid):
+    f_name = '/proc/' + str(pid) + '/stat'
+    s = subprocess.check_output(["cat", f_name])
+    fields = s.decode().split()
+    d = {}
+    d['pid'] = fields[0]
+    d['command'] = fields[1]
+    d['state'] = fields[2]
+    d['parent_pid'] = fields[3]
+    d['process_grp'] = fields[4]
+    d['session_id'] = fields[5]
+    d['tty_nr'] = fields[6]
+    d['num_threads'] = fields[19]
+    d['starttime'] = fields[21]
+    return d
+
+
+def get_processor_info():
+    s = subprocess.check_output(["cat", "/proc/cpuinfo"])
+    lines = s.decode().splitlines()
+    d = {}
+    for line in lines:
+        try:
+            name, val = line.split(":")
+        except ValueError:
+            name = line[:line.__len__()-2]
+            value = ''
+        d[name.strip()] = val.strip()
+    return d
+
+
+def get_default_route_info():
+    proc1 = subprocess.Popen(['ip', 'r'], stdout=subprocess.PIPE)
+    proc2 = subprocess.Popen(['grep', 'default'], stdin=proc1.stdout,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc1.stdout.close()
+    out, err = proc2.communicate()
+    return out.decode()
+
