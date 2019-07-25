@@ -1,7 +1,7 @@
 import socket
 import ssl
 import time
-
+from html.parser import HTMLParser
 
 class MyHttpRequest:
 
@@ -89,6 +89,7 @@ class MyHttpResponse:
         self.string_list = text.splitlines()
         self.http_ver = self.string_list[0].split(" ")[0]
         self.status_code = self.string_list[0].split(" ")[1]
+        self.html_info = {}
 
         self.headers = []
         i = 1
@@ -102,8 +103,47 @@ class MyHttpResponse:
 
         self.body = ''.join(self.string_list[i:])
 
+        parser = MyHTMLParser()
+        parser.reset()
+        parser.feed(self.body)
+        self.html_info['imgs'] = parser.imgs
+        self.html_info['links'] = parser.hrefs
+        self.html_info['tags'] = parser.tags
+        max_count = max(parser.tags_count.values())
+        self.html_info['most_frequent_tags'] = []
+        for tag in parser.tags_count.keys():
+            if parser.tags_count[tag] == max_count:
+                self.html_info['most_frequent_tags'].append(tag)
+
     def get_full_text(self):
         return self.text
 
     def get_starting_line(self):
         return self.string_list[0]
+
+
+class MyHTMLParser(HTMLParser):
+
+    def __init__(self):
+        super(MyHTMLParser, self).__init__()
+        self.imgs = []
+        self.hrefs = []
+        self.tags = set()
+        self.tags_count = {}
+
+    def handle_starttag(self, tag, attrs):
+        self.tags.add(tag)
+        tag_count = self.tags_count.get(tag, 0)
+        self.tags_count[tag] = tag_count + 1
+        for name,value in attrs:
+            if name == 'href':
+                self.hrefs.append(value)
+            if tag == 'img' and name == 'src':
+                self.imgs.append(value)
+        print("Encountered a start tag:", tag)
+
+    def handle_endtag(self, tag):
+        pass
+
+    def handle_data(self, data):
+        pass
