@@ -124,3 +124,21 @@ def get_default_route_info():
     out, err = proc2.communicate()
     return out.decode()
 
+
+def get_ni_info():
+    s = subprocess.check_output(["ifconfig"])
+    int_lines = s.decode().split("\n\n")
+
+    def parse_int_line(line):
+        d = {}
+        pos = line.index(":")
+        d['name'] = line[:pos]
+        return d
+    d = {}
+    for line in int_lines:
+        if line != '':
+            line_d = parse_int_line(line)
+            d[line_d['name']] = line_d
+    return d
+
+print(get_ni_info())
